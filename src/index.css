@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* ClimaSense Color System - Light Mode */
+    --background: 216 100% 98%;
+    --foreground: 210 100% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 100% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 100% 12%;
+
+    /* Deep Navy Primary */
+    --primary: 210 100% 12%;
+    --primary-foreground: 216 100% 98%;
+    --primary-hover: 210 100% 18%;
+
+    /* Lime Green Accent */
+    --accent: 140 65% 80%;
+    --accent-foreground: 210 100% 12%;
+    --accent-hover: 140 65% 70%;
+
+    /* Sky Blue Interactive */
+    --interactive: 197 92% 61%;
+    --interactive-foreground: 210 100% 12%;
+    --interactive-hover: 197 92% 55%;
+
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 210 100% 12%;
+
+    --muted: 210 20% 92%;
+    --muted-foreground: 210 40% 45%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 30% 88%;
+    --input: 210 30% 88%;
+    --ring: 197 92% 61%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 12%) 0%, hsl(210 85% 25%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.9) 0%, hsl(216 100% 98% / 0.8) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(140 65% 80%) 0%, hsl(197 92% 61%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px hsl(210 100% 12% / 0.08);
+    --shadow-glow: 0 0 30px hsl(197 92% 61% / 0.3);
+    --shadow-card: 0 8px 32px hsl(210 100% 12% / 0.12);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    /* ClimaSense Color System - Dark Mode */
+    --background: 210 100% 8%;
+    --foreground: 216 100% 98%;
+
+    --card: 210 85% 12%;
+    --card-foreground: 216 100% 98%;
+
+    --popover: 210 85% 12%;
+    --popover-foreground: 216 100% 98%;
+
+    /* Light accents for dark mode */
+    --primary: 216 100% 98%;
+    --primary-foreground: 210 100% 12%;
+    --primary-hover: 210 40% 90%;
+
+    /* Adjusted lime green for dark mode */
+    --accent: 140 65% 65%;
+    --accent-foreground: 210 100% 98%;
+    --accent-hover: 140 65% 55%;
+
+    /* Brighter sky blue for dark mode */
+    --interactive: 197 92% 70%;
+    --interactive-foreground: 210 100% 10%;
+    --interactive-hover: 197 92% 65%;
+
+    --secondary: 210 50% 18%;
+    --secondary-foreground: 216 100% 98%;
+
+    --muted: 210 50% 18%;
+    --muted-foreground: 210 30% 70%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 216 100% 98%;
+
+    --border: 210 50% 22%;
+    --input: 210 50% 22%;
+    --ring: 197 92% 70%;
+
+    /* Dark mode gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 8%) 0%, hsl(210 85% 15%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(210 85% 12% / 0.8) 0%, hsl(210 70% 18% / 0.6) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(140 65% 65%) 0%, hsl(197 92% 70%) 100%);
+
+    /* Dark mode shadows with glow */
+    --shadow-soft: 0 4px 20px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(197 92% 70% / 0.5);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

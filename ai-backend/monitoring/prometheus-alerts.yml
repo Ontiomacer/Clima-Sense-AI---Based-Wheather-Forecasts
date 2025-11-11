@@ -1,0 +1,202 @@
+groups:
+  - name: graphcast_critical_alerts
+    rules:
+      # Critical: High Error Rate
+      - alert: GraphCastHighErrorRate
+        expr: (rate(graphcast_errors_total[5m]) / rate(graphcast_requests_total[5m])) > 0.10
+        for: 5m
+        labels:
+          severity: critical
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast high error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes (threshold: 10%)"
+          runbook_url: "https://docs.climasense.com/runbooks/high-error-rate"
+          dashboard_url: "https://grafana.climasense.com/d/graphcast"
+
+      # Critical: Model Load Failure
+      - alert: GraphCastModelLoadFailure
+        expr: graphcast_errors_total{error_type="model_load_error"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast model failed to load"
+          description: "Model loading has failed. Service cannot process inference requests."
+          runbook_url: "https://docs.climasense.com/runbooks/model-load-failure"
+
+      # Critical: High Inference Timeout Rate
+      - alert: GraphCastInferenceTimeoutHigh
+        expr: (rate(graphcast_errors_total{error_type="inference_timeout"}[10m]) / rate(graphcast_inference_total[10m])) > 0.20
+        for: 10m
+        labels:
+          severity: critical
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "High inference timeout rate"
+          description: "{{ $value | humanizePercentage }} of inferences are timing out (threshold: 20%)"
+          runbook_url: "https://docs.climasense.com/runbooks/inference-timeout"
+
+      # Critical: Memory Exhaustion
+      - alert: GraphCastMemoryExhaustion
+        expr: (process_resident_memory_bytes{job="graphcast-backend"} / node_memory_MemTotal_bytes) > 0.90
+        for: 5m
+        labels:
+          severity: critical
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast memory usage critical"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 90%)"
+          runbook_url: "https://docs.climasense.com/runbooks/memory-exhaustion"
+
+      # Critical: Service Down
+      - alert: GraphCastServiceDown
+        expr: up{job="graphcast-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast service is down"
+          description: "GraphCast backend service is not responding to health checks"
+          runbook_url: "https://docs.climasense.com/runbooks/service-down"
+
+  - name: graphcast_warning_alerts
+    rules:
+      # Warning: Low Cache Hit Rate
+      - alert: GraphCastLowCacheHitRate
+        expr: (rate(graphcast_cache_hits[1h]) / rate(graphcast_requests_total[1h])) < 0.50
+        for: 1h
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} over the last hour (threshold: 50%)"
+          runbook_url: "https://docs.climasense.com/runbooks/low-cache-hit-rate"
+
+      # Warning: ERA5 Fetch Failures
+      - alert: GraphCastERA5FetchFailures
+        expr: (rate(graphcast_era5_fetch_success_total[15m]) / rate(graphcast_era5_fetch_attempts_total[15m])) < 0.95
+        for: 15m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast ERA5 fetch failures detected"
+          description: "ERA5 success rate is {{ $value | humanizePercentage }} (threshold: 95%)"
+          runbook_url: "https://docs.climasense.com/runbooks/era5-fetch-failures"
+
+      # Warning: Slow CPU Inference
+      - alert: GraphCastSlowCPUInference
+        expr: histogram_quantile(0.95, rate(graphcast_inference_duration_seconds_bucket{device="cpu"}[10m])) > 180
+        for: 10m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast slow inference performance on CPU"
+          description: "p95 inference time is {{ $value }}s (threshold: 180s)"
+          runbook_url: "https://docs.climasense.com/runbooks/slow-inference"
+
+      # Warning: Slow GPU Inference
+      - alert: GraphCastSlowGPUInference
+        expr: histogram_quantile(0.95, rate(graphcast_inference_duration_seconds_bucket{device="gpu"}[10m])) > 45
+        for: 10m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast slow inference performance on GPU"
+          description: "p95 inference time is {{ $value }}s (threshold: 45s)"
+          runbook_url: "https://docs.climasense.com/runbooks/slow-inference"
+
+      # Warning: High Request Rate
+      - alert: GraphCastHighRequestRate
+        expr: rate(graphcast_requests_total[1m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast high request rate"
+          description: "Request rate is {{ $value }} requests/minute (threshold: 100)"
+          runbook_url: "https://docs.climasense.com/runbooks/high-request-rate"
+
+      # Warning: High CPU Usage
+      - alert: GraphCastHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="graphcast-backend"}[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast high CPU usage"
+          description: "CPU usage is {{ $value }}% (threshold: 80%)"
+          runbook_url: "https://docs.climasense.com/runbooks/high-cpu-usage"
+
+      # Warning: High Memory Usage
+      - alert: GraphCastHighMemoryUsage
+        expr: (process_resident_memory_bytes{job="graphcast-backend"} / node_memory_MemTotal_bytes) > 0.80
+        for: 10m
+        labels:
+          severity: warning
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast high memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} (threshold: 80%)"
+          runbook_url: "https://docs.climasense.com/runbooks/high-memory-usage"
+
+  - name: graphcast_info_alerts
+    rules:
+      # Info: Cache Size Growing
+      - alert: GraphCastCacheSizeGrowing
+        expr: graphcast_cache_size_bytes > 5368709120
+        for: 30m
+        labels:
+          severity: info
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast cache size growing"
+          description: "Cache size is {{ $value | humanize1024 }}B (threshold: 5GB)"
+          runbook_url: "https://docs.climasense.com/runbooks/cache-size-growing"
+
+      # Info: GPU Not Available
+      - alert: GraphCastGPUNotAvailable
+        expr: absent(nvidia_gpu_utilization_percent{job="graphcast-backend"})
+        for: 5m
+        labels:
+          severity: info
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast GPU not available"
+          description: "No GPU metrics detected. Service is running on CPU only."
+          runbook_url: "https://docs.climasense.com/runbooks/gpu-not-available"
+
+      # Info: Pre-computation Not Running
+      - alert: GraphCastPrecomputationNotRunning
+        expr: time() - graphcast_last_precomputation_timestamp > 86400
+        for: 1h
+        labels:
+          severity: info
+          component: graphcast
+          team: backend
+        annotations:
+          summary: "GraphCast pre-computation not running"
+          description: "Last pre-computation was {{ $value | humanizeDuration }} ago"
+          runbook_url: "https://docs.climasense.com/runbooks/precomputation-not-running"

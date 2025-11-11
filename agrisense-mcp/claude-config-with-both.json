@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "agrisense": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\Anil\\Desktop\\Hackathons\\clima-aware-ai-main\\clima-aware-ai-main\\agrisense-mcp\\dist\\index.js"
+      ],
+      "env": {
+        "PORT": "9090",
+        "AI_BACKEND_URL": "http://localhost:8000",
+        "NODE_ENV": "production"
+      }
+    },
+    "zomato-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp-server.zomato.com/mcp"
+      ]
+    }
+  }
+}

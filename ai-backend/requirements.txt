@@ -1,0 +1,40 @@
+# ClimaSense AI Backend Requirements
+# For Python 3.8+
+
+# Core Framework
+fastapi[all]==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# AI/ML Libraries (for AgriBERT classifier)
+torch>=2.0.0
+transformers>=4.35.0
+accelerate>=0.24.0
+sentencepiece>=0.1.99
+protobuf>=4.25.0
+
+# GraphCast Dependencies
+jax[cpu]>=0.4.20
+dm-haiku>=0.0.10
+xarray>=2023.1.0
+numpy>=1.24.0
+scipy>=1.10.0
+tqdm>=4.66.0
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# ERA5 Data Access
+cdsapi>=0.6.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# Note: For GPU support with CUDA, install PyTorch separately:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 
+# For CPU-only (default):
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu

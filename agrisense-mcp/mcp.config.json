@@ -1,0 +1,29 @@
+{
+  "name": "agrisense-mcp",
+  "version": "1.0.0",
+  "description": "AgriSense MCP Server for AI-powered agricultural analysis",
+  "command": "node",
+  "args": ["dist/index.js"],
+  "port": 9090,
+  "endpoints": {
+    "analyze": {
+      "path": "/analyze",
+      "method": "POST",
+      "description": "Analyze crop data with AI models"
+    },
+    "dashboard": {
+      "path": "/dashboard",
+      "method": "GET",
+      "description": "View server health and metrics"
+    },
+    "health": {
+      "path": "/health",
+      "method": "GET",
+      "description": "Health check endpoint"
+    }
+  },
+  "ai_models": {
+    "agribert": "GautamR/agri_bert_classifier",
+    "weather_recommendation": "pjh11098/Weather_Forecast-Based_Personalized_Recommendation_System_with_Gemma_Model"
+  }
+}

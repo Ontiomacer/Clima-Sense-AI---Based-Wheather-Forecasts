@@ -1,0 +1,160 @@
+groups:
+  - name: graphcast_recording_rules
+    interval: 30s
+    rules:
+      # Cache Performance
+      - record: graphcast:cache_hit_rate:5m
+        expr: rate(graphcast_cache_hits[5m]) / rate(graphcast_requests_total[5m])
+
+      - record: graphcast:cache_hit_rate:1h
+        expr: rate(graphcast_cache_hits[1h]) / rate(graphcast_requests_total[1h])
+
+      - record: graphcast:cache_hit_rate:24h
+        expr: rate(graphcast_cache_hits[24h]) / rate(graphcast_requests_total[24h])
+
+      # Error Rates
+      - record: graphcast:error_rate:5m
+        expr: rate(graphcast_errors_total[5m]) / rate(graphcast_requests_total[5m])
+
+      - record: graphcast:error_rate:1h
+        expr: rate(graphcast_errors_total[1h]) / rate(graphcast_requests_total[1h])
+
+      - record: graphcast:error_rate_by_type:5m
+        expr: rate(graphcast_errors_total[5m]) / ignoring(error_type) group_left rate(graphcast_requests_total[5m])
+
+      # Inference Performance
+      - record: graphcast:inference_duration:avg:5m
+        expr: rate(graphcast_inference_duration_seconds_sum[5m]) / rate(graphcast_inference_duration_seconds_count[5m])
+
+      - record: graphcast:inference_duration:p50:5m
+        expr: histogram_quantile(0.50, rate(graphcast_inference_duration_seconds_bucket[5m]))
+
+      - record: graphcast:inference_duration:p95:5m
+        expr: histogram_quantile(0.95, rate(graphcast_inference_duration_seconds_bucket[5m]))
+
+      - record: graphcast:inference_duration:p99:5m
+        expr: histogram_quantile(0.99, rate(graphcast_inference_duration_seconds_bucket[5m]))
+
+      # Inference Performance by Device
+      - record: graphcast:inference_duration_by_device:avg:5m
+        expr: rate(graphcast_inference_duration_seconds_sum[5m]) / rate(graphcast_inference_duration_seconds_count[5m])
+
+      - record: graphcast:inference_duration_by_device:p95:5m
+        expr: histogram_quantile(0.95, rate(graphcast_inference_duration_seconds_bucket[5m]))
+
+      # Request Rates
+      - record: graphcast:request_rate:1m
+        expr: rate(graphcast_requests_total[1m])
+
+      - record: graphcast:request_rate:5m
+        expr: rate(graphcast_requests_total[5m])
+
+      - record: graphcast:request_rate:1h
+        expr: rate(graphcast_requests_total[1h])
+
+      - record: graphcast:request_rate_by_endpoint:5m
+        expr: rate(graphcast_requests_total[5m])
+
+      # API Response Times
+      - record: graphcast:api_response_time:avg:5m
+        expr: rate(http_request_duration_seconds_sum{endpoint=~"/api/graphcast.*"}[5m]) / rate(http_request_duration_seconds_count{endpoint=~"/api/graphcast.*"}[5m])
+
+      - record: graphcast:api_response_time:p50:5m
+        expr: histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{endpoint=~"/api/graphcast.*"}[5m]))
+
+      - record: graphcast:api_response_time:p95:5m
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{endpoint=~"/api/graphcast.*"}[5m]))
+
+      - record: graphcast:api_response_time:p99:5m
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{endpoint=~"/api/graphcast.*"}[5m]))
+
+      # ERA5 Data Fetch Performance
+      - record: graphcast:era5_success_rate:5m
+        expr: rate(graphcast_era5_fetch_success_total[5m]) / rate(graphcast_era5_fetch_attempts_total[5m])
+
+      - record: graphcast:era5_success_rate:15m
+        expr: rate(graphcast_era5_fetch_success_total[15m]) / rate(graphcast_era5_fetch_attempts_total[15m])
+
+      - record: graphcast:era5_success_rate:1h
+        expr: rate(graphcast_era5_fetch_success_total[1h]) / rate(graphcast_era5_fetch_attempts_total[1h])
+
+      - record: graphcast:era5_fetch_duration:avg:5m
+        expr: rate(graphcast_era5_fetch_duration_seconds_sum[5m]) / rate(graphcast_era5_fetch_duration_seconds_count[5m])
+
+      - record: graphcast:era5_fetch_duration:p95:5m
+        expr: histogram_quantile(0.95, rate(graphcast_era5_fetch_duration_seconds_bucket[5m]))
+
+      # System Resource Utilization
+      - record: graphcast:cpu_usage:5m
+        expr: rate(process_cpu_seconds_total{job="graphcast-backend"}[5m]) * 100
+
+      - record: graphcast:memory_usage_percent
+        expr: (process_resident_memory_bytes{job="graphcast-backend"} / node_memory_MemTotal_bytes) * 100
+
+      - record: graphcast:memory_usage_gb
+        expr: process_resident_memory_bytes{job="graphcast-backend"} / 1024 / 1024 / 1024
+
+      # GPU Metrics (if available)
+      - record: graphcast:gpu_utilization:avg:5m
+        expr: avg(nvidia_gpu_utilization_percent{job="graphcast-backend"})
+
+      - record: graphcast:gpu_memory_used_gb
+        expr: nvidia_gpu_memory_used_bytes{job="graphcast-backend"} / 1024 / 1024 / 1024
+
+      # Cache Metrics
+      - record: graphcast:cache_size_mb
+        expr: graphcast_cache_size_bytes / 1024 / 1024
+
+      - record: graphcast:cache_size_gb
+        expr: graphcast_cache_size_bytes / 1024 / 1024 / 1024
+
+      # Inference Success Rate
+      - record: graphcast:inference_success_rate:5m
+        expr: rate(graphcast_inference_total{status="success"}[5m]) / rate(graphcast_inference_total[5m])
+
+      - record: graphcast:inference_success_rate:1h
+        expr: rate(graphcast_inference_total{status="success"}[1h]) / rate(graphcast_inference_total[1h])
+
+      # Request Distribution
+      - record: graphcast:requests_by_endpoint:total
+        expr: sum by (endpoint) (graphcast_requests_total)
+
+      - record: graphcast:requests_by_status:total
+        expr: sum by (status_code) (graphcast_requests_total)
+
+  - name: graphcast_aggregations
+    interval: 1m
+    rules:
+      # Daily aggregations for capacity planning
+      - record: graphcast:daily_request_count
+        expr: sum(increase(graphcast_requests_total[24h]))
+
+      - record: graphcast:daily_inference_count
+        expr: sum(increase(graphcast_inference_total[24h]))
+
+      - record: graphcast:daily_error_count
+        expr: sum(increase(graphcast_errors_total[24h]))
+
+      - record: graphcast:daily_cache_hits
+        expr: sum(increase(graphcast_cache_hits[24h]))
+
+      # Hourly aggregations
+      - record: graphcast:hourly_request_count
+        expr: sum(increase(graphcast_requests_total[1h]))
+
+      - record: graphcast:hourly_inference_count
+        expr: sum(increase(graphcast_inference_total[1h]))
+
+      # Peak metrics
+      - record: graphcast:peak_request_rate:1h
+        expr: max_over_time(graphcast:request_rate:1m[1h])
+
+      - record: graphcast:peak_inference_time:1h
+        expr: max_over_time(graphcast:inference_duration:p99:5m[1h])
+
+      # Availability metrics
+      - record: graphcast:uptime_percent:24h
+        expr: avg_over_time(up{job="graphcast-backend"}[24h]) * 100
+
+      - record: graphcast:availability:24h
+        expr: (1 - (sum(increase(graphcast_errors_total[24h])) / sum(increase(graphcast_requests_total[24h])))) * 100
