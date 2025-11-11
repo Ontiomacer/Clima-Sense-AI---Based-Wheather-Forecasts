@@ -17,6 +17,12 @@ build/
 .env.production
 .env.development
 
+# Google Cloud Credentials (NEVER commit these!)
+*-credentials.json
+*-service-account.json
+massive-hexagon-*.json
+*.json.key
+
 # Python
 __pycache__/
 *.py[cod]
