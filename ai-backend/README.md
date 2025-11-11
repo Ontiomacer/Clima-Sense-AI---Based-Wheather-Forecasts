@@ -182,8 +182,7 @@ Models are automatically cached in `./.model_cache/` after first download.
 Configured to allow:
 - `http://localhost:5170` (local development)
 - `http://localhost:3000` (alternative local)
-- `https://preview--climasis-ai.lovable.app` (Loveable preview)
-- `https://*.lovable.app` (all Loveable domains)
+- All origins (for development - restrict in production)
 
 ---
 

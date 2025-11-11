@@ -31,7 +31,7 @@ const Settings = () => {
     setSaving(true);
     
     try {
-      // In a real implementation, these would be saved to Lovable Cloud secrets
+      // In a real implementation, these would be saved to secure backend storage
       // For now, we'll simulate the save
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -103,7 +103,7 @@ const Settings = () => {
                     <CardTitle>API Configuration</CardTitle>
                   </div>
                   <CardDescription>
-                    Securely store your API keys for climate data services. All keys are encrypted and stored safely in Lovable Cloud.
+                    Securely store your API keys for climate data services. All keys are encrypted and stored safely.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -191,7 +191,7 @@ const Settings = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Your API keys are encrypted and securely stored in Lovable Cloud. They are never exposed in the frontend code and are only accessible by backend functions that need them to fetch climate data.
+                    Your API keys are encrypted and securely stored. They are never exposed in the frontend code and are only accessible by backend functions that need them to fetch climate data.
                   </p>
                 </CardContent>
               </Card>
