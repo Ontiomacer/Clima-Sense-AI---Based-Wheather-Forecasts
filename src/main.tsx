@@ -13,8 +13,8 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById("root")!).render(
   <ClerkProvider 
     publishableKey={PUBLISHABLE_KEY}
-    afterSignInUrl="/dashboard"
-    afterSignUpUrl="/dashboard"
+    signInFallbackRedirectUrl="/dashboard"
+    signUpFallbackRedirectUrl="/dashboard"
     signInUrl="/sign-in"
     signUpUrl="/sign-up"
   >

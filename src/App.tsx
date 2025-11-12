@@ -51,8 +51,8 @@ const App = () => (
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/sign-in" element={<SignInPage />} />
-                <Route path="/sign-up" element={<SignUpPage />} />
+                <Route path="/sign-in/*" element={<SignInPage />} />
+                <Route path="/sign-up/*" element={<SignUpPage />} />
                 <Route path="/about" element={
                   <Suspense fallback={<PageLoader />}>
                     <AboutPage />
