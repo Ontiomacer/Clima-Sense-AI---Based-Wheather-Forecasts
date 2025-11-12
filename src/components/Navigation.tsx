@@ -14,22 +14,27 @@ const Navigation = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const location = useLocation();
 
-  // Public routes that should show LandingNav
-  const publicRoutes = ['/', '/about', '/contact', '/sign-in', '/sign-up'];
-  const isPublicRoute = publicRoutes.includes(location.pathname);
+  // Routes that should always show LandingNav (only landing page and auth pages)
+  const landingOnlyRoutes = ['/', '/sign-in', '/sign-up'];
+  const isLandingRoute = landingOnlyRoutes.includes(location.pathname);
 
   // Don't render navigation while Clerk is loading
   if (!isLoaded) {
     return null;
   }
 
-  // Show LandingNav for public routes or when user is not signed in
-  if (isPublicRoute || !isSignedIn) {
+  // Show LandingNav only for landing page and auth pages when not signed in
+  if (isLandingRoute && !isSignedIn) {
     return <LandingNav />;
   }
 
-  // Show AppNav for authenticated users on protected routes
-  return <AppNav />;
+  // Show AppNav for all other routes (including About/Contact) when signed in
+  if (isSignedIn) {
+    return <AppNav />;
+  }
+
+  // Show LandingNav for public pages when not signed in
+  return <LandingNav />;
 };
 
 export default Navigation;
