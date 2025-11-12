@@ -10,22 +10,24 @@ import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import AdminPanel from '@/components/AdminPanel';
+import { useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, loading, isAdmin } = useAuth();
+  const { isSignedIn, isLoaded } = useClerkAuth();
+  const { isAdmin } = useAuth();
   const [openWeatherKey, setOpenWeatherKey] = useState('');
   const [geeServiceAccount, setGeeServiceAccount] = useState('');
   const [geePrivateKey, setGeePrivateKey] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
+    if (isLoaded && !isSignedIn) {
+      navigate('/sign-in');
     }
-  }, [user, loading, navigate]);
+  }, [isSignedIn, isLoaded, navigate]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -50,7 +52,7 @@ const Settings = () => {
     }
   };
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />

@@ -7,6 +7,21 @@
 
 AI-powered climate intelligence platform for smart agriculture in Maharashtra, India. Features real-time weather forecasting, satellite imagery analysis, and multilingual support (English, Hindi, Marathi).
 
+## 🎯 New Features
+
+### 🔐 Secure Authentication with Clerk
+- Professional authentication system powered by Clerk
+- Email/password and social login (Google, GitHub)
+- Secure session management
+- User profile management
+
+### 🌟 Professional Landing Page
+- Modern, engaging design with animations
+- Clear value proposition and feature showcase
+- Responsive design for all devices
+- Smooth transitions and climate-themed visuals
+
+![ClimaSense Landing Page](https://via.placeholder.com/800x400?text=ClimaSense+Landing+Page)
 ![ClimaSense Dashboard](https://via.placeholder.com/800x400?text=ClimaSense+Dashboard)
 
 ## ✨ Features
@@ -63,6 +78,12 @@ This starts all services:
 - ✅ AI Forecast Server - Port 3002
 - ✅ React Frontend - Port 5173
 
+**First Time Setup:**
+1. Visit http://localhost:5173 (landing page)
+2. Click "Get Started" to create an account
+3. Sign up with email or social login
+4. Access the dashboard and all features
+
 ### Manual Setup
 
 #### 1. Clone Repository
@@ -98,10 +119,22 @@ cd ..
 
 Create `.env` file in root:
 ```env
+# Clerk Authentication (Required)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
+
+# Supabase (for database)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key
+
+# Google Maps
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
 ```
+
+**Get Clerk Keys:**
+1. Sign up at [clerk.com](https://clerk.com)
+2. Create a new application
+3. Copy the publishable key from the dashboard
+4. See [CLERK_SETUP.md](CLERK_SETUP.md) for detailed instructions
 
 #### 4. Start Services
 
@@ -133,16 +166,34 @@ npm run ai-forecast
 
 ### Access the Application
 
-- **Frontend**: http://localhost:5173
+- **Landing Page**: http://localhost:5173 (public)
+- **Dashboard**: http://localhost:5173/dashboard (requires sign-in)
 - **AI Backend**: http://localhost:8000
 - **AgriSense MCP**: http://localhost:9090
 - **MCP Dashboard**: http://localhost:9090/dashboard
 
+**Authentication:**
+- Visit the landing page and click "Get Started" or "Sign In"
+- Create an account or sign in with Google/GitHub
+- Access all features after authentication
+
 ## 📚 Documentation
 
+### Deployment Guides
+- **[Deployment Documentation Index](DEPLOYMENT_DOCS_INDEX.md)** - Complete guide to all deployment docs
+- [Complete Deployment Guide](DEPLOYMENT.md) - Comprehensive deployment instructions
+- [Vercel Deployment](VERCEL_DEPLOYMENT_COMPLETE.md) - Step-by-step Vercel setup
+- [Clerk Setup Guide](CLERK_SETUP.md) - Complete Clerk authentication setup
+- [Environment Variables Setup](VERCEL_ENV_SETUP.md) - Detailed Clerk & Vercel configuration
+- [Quick Clerk Setup](VERCEL_CLERK_CONFIG.md) - Fast Clerk configuration
+
+### Development Guides
+- **[Quick Start Guide](QUICK_START_GUIDE.md)** - Get started in 5 minutes
+- **[Changelog](CHANGELOG.md)** - Version history and updates
+- [Landing Page Documentation](LANDING_PAGE.md) - Complete landing page guide
+- [Screenshots Guide](SCREENSHOTS.md) - How to capture and manage screenshots
 - [Architecture Overview](ARCHITECTURE.md)
 - [Setup Instructions](SETUP_INSTRUCTIONS.md)
-- [Quick Start Guide](QUICK_START.md)
 - [AgriSense MCP Guide](AGRISENSE_MCP_GUIDE.md)
 - [Language Support](LANGUAGE_SUPPORT.md)
 - [GraphCast Integration](ai-backend/graphcast/ERA5_SETUP.md)
@@ -202,7 +253,15 @@ npm run ai-forecast
 
 ## 📱 Features by Page
 
-### Dashboard
+### Landing Page (Public)
+- Professional hero section with animated gradients
+- Feature showcase with 6 key capabilities
+- "How It Works" process explanation
+- Statistics and metrics display
+- Call-to-action sections
+- Responsive design for all devices
+
+### Dashboard (Protected)
 - Real-time climate metrics
 - AI Climate Risk Index
 - Key insights and recommendations
@@ -303,10 +362,18 @@ GET  /health
 ### Frontend Environment Variables
 
 ```env
+# Clerk Authentication (Required)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
+
+# Supabase (for database)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key
+
+# Google Maps
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
 ```
+
+**Important:** Clerk authentication is required for the application to work. See [CLERK_SETUP.md](CLERK_SETUP.md) for setup instructions.
 
 ### Backend Configuration
 
@@ -365,11 +432,43 @@ npm start
 
 ## 🚢 Deployment
 
-### Frontend (Vercel/Netlify)
+### Quick Deployment Guides
 
-1. Connect GitHub repository
-2. Set environment variables
-3. Deploy automatically on push
+- **📖 [Complete Deployment Guide](DEPLOYMENT.md)** - Comprehensive deployment instructions
+- **🚀 [Vercel Deployment](VERCEL_DEPLOYMENT_COMPLETE.md)** - Step-by-step Vercel setup
+- **🔐 [Environment Variables Setup](VERCEL_ENV_SETUP.md)** - Detailed guide for Clerk & Vercel
+- **⚡ [Quick Clerk Setup](VERCEL_CLERK_CONFIG.md)** - Fast Clerk configuration
+
+### Frontend (Vercel) - Recommended
+
+1. **Connect Repository**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Framework: Vite
+
+2. **Configure Environment Variables**
+   ```env
+   # Required for authentication
+   VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_key
+   
+   # Database
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_key
+   
+   # Maps
+   VITE_GOOGLE_MAPS_API_KEY=your_maps_key
+   ```
+   **📖 See [CLERK_SETUP.md](CLERK_SETUP.md) for Clerk setup**
+   **📖 See [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md) for detailed instructions**
+
+3. **Deploy**
+   - Click "Deploy"
+   - Automatic deployments on every push
+
+4. **Configure Clerk**
+   - Add production domain to [Clerk Dashboard](https://dashboard.clerk.com/)
+   - Set redirect URLs
+   - Test authentication
 
 ### Backend (Railway/Render)
 
@@ -424,6 +523,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
+### Completed ✅
+- [x] Professional landing page
+- [x] Clerk authentication integration
+- [x] Protected routes
+- [x] Social login (Google, GitHub)
+- [x] User profile management
+
+### Upcoming 🚀
 - [ ] Mobile app (React Native)
 - [ ] More Indian languages (Gujarati, Tamil, Telugu)
 - [ ] Offline mode

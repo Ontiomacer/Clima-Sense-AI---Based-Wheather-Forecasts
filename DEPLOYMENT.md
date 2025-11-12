@@ -16,10 +16,13 @@ Complete guide for deploying ClimaSense AI to production.
 
 ### Required Accounts
 - [ ] GitHub account
+- [ ] **Clerk account (for authentication)** - [Sign up here](https://clerk.com)
 - [ ] Vercel account (for frontend)
 - [ ] Railway/Render account (for backend)
 - [ ] Supabase account (for database)
 - [ ] Google Cloud account (for Maps API)
+
+**Priority Setup:** Start with Clerk authentication as it's required for the application to function.
 
 ### Required Tools
 - Git
@@ -40,11 +43,21 @@ cd Clima-Sense-AI---Based-Wheather-Forecasts
 
 **Frontend (.env):**
 ```env
+# Clerk Authentication (Required)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
+
+# Supabase Database
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
+
+# Google Maps
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
+
+# Backend API
 VITE_API_URL=https://your-backend.railway.app
 ```
+
+**Note:** Clerk authentication is required. See [CLERK_SETUP.md](CLERK_SETUP.md) for detailed setup instructions.
 
 **Backend (ai-backend/.env):**
 ```env
@@ -75,11 +88,29 @@ LOG_LEVEL=INFO
 3. **Add Environment Variables**
    - Go to Project Settings → Environment Variables
    - Add all variables from `.env`
+   - **Required for Clerk Authentication:**
+     - `VITE_CLERK_PUBLISHABLE_KEY` - Get from [Clerk Dashboard](https://dashboard.clerk.com/)
+     - Select all environments: Production, Preview, Development
+   - **📖 Detailed Instructions:** See [VERCEL_ENV_SETUP.md](./VERCEL_ENV_SETUP.md) for step-by-step guide
+   - **Quick Reference:** See [VERCEL_CLERK_CONFIG.md](./VERCEL_CLERK_CONFIG.md) for Clerk-specific setup
 
 4. **Deploy**
    - Click "Deploy"
    - Wait for build to complete
    - Your site will be live at `https://your-project.vercel.app`
+
+5. **Configure Clerk for Production**
+   - After deployment, go to [Clerk Dashboard](https://dashboard.clerk.com/)
+   - Navigate to Domains section
+   - Add your Vercel production URL: `https://your-project.vercel.app`
+   - Configure redirect URLs in Paths section:
+     - Sign-in URL: `/sign-in`
+     - Sign-up URL: `/sign-up`
+     - Home URL: `/` (landing page)
+     - After sign-in: `/dashboard`
+     - After sign-up: `/dashboard`
+   - Test authentication flow on live site
+   - **📖 See [CLERK_SETUP.md](CLERK_SETUP.md) for complete Clerk configuration guide**
 
 ### Option 2: Vercel CLI
 
@@ -244,7 +275,10 @@ Sentry.init({
 
 ## 🔒 Security Checklist
 
+- [ ] **Clerk authentication configured** (see [CLERK_SETUP.md](CLERK_SETUP.md))
 - [ ] Environment variables set correctly
+- [ ] Clerk publishable key added to Vercel
+- [ ] Production domain added to Clerk dashboard
 - [ ] CORS configured properly
 - [ ] API keys not exposed in frontend
 - [ ] HTTPS enabled (automatic)
@@ -253,6 +287,7 @@ Sentry.init({
 - [ ] Input validation on all endpoints
 - [ ] SQL injection prevention
 - [ ] XSS protection enabled
+- [ ] Protected routes working correctly
 
 ## 🧪 Pre-Deployment Testing
 
@@ -275,11 +310,15 @@ python -m pytest
 npx serve dist
 
 # Test all features
-# - Navigation
+# - Landing page loads correctly
+# - Sign-up/Sign-in flow works
+# - Protected routes redirect to sign-in
+# - Navigation after authentication
 # - API calls
 # - Language switching
 # - AI Chat
 # - Map functionality
+# - Sign-out functionality
 ```
 
 ### 3. Performance Testing
@@ -440,14 +479,27 @@ pip install -r requirements.txt --force-reinstall
 
 ## ✅ Deployment Checklist
 
+### Pre-Deployment
 - [ ] Repository pushed to GitHub
-- [ ] Environment variables configured
+- [ ] **Clerk account created and configured** (see [CLERK_SETUP.md](CLERK_SETUP.md))
+- [ ] Environment variables configured locally
+- [ ] Local testing completed (landing page, auth flow, protected routes)
+
+### Deployment
 - [ ] Frontend deployed to Vercel
 - [ ] Backend deployed to Railway
 - [ ] Database setup on Supabase
+- [ ] **Clerk publishable key added to Vercel**
+- [ ] **Production domain added to Clerk dashboard**
 - [ ] Custom domains configured
 - [ ] SSL certificates active
 - [ ] CORS configured correctly
+
+### Post-Deployment
+- [ ] **Authentication flow tested on live site**
+- [ ] **Landing page displays correctly**
+- [ ] **Protected routes working**
+- [ ] **Sign-up/Sign-in/Sign-out tested**
 - [ ] Monitoring setup
 - [ ] Backup strategy in place
 - [ ] Documentation updated

@@ -1,40 +1,19 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/gee-data",
-      "dest": "https://your-gee-server-url.com/api/gee-data"
+      "source": "/api/ai-forecast",
+      "destination": "/api/ai-forecast.js"
     },
     {
-      "src": "/api/ai-forecast",
-      "dest": "https://your-ai-forecast-server-url.com/api/ai-forecast"
+      "source": "/api/gee-data",
+      "destination": "/api/gee-data.js"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
+      "source": "/api/agri-analysis",
+      "destination": "/api/agri-analysis.js"
     }
   ]
 }

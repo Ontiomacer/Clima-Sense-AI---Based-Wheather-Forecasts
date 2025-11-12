@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@clerk/clerk-react';
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
+    if (isLoaded && !isSignedIn) {
+      navigate('/sign-in');
     }
-  }, [user, loading, navigate]);
+  }, [isSignedIn, isLoaded, navigate]);
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p>Loading...</p>

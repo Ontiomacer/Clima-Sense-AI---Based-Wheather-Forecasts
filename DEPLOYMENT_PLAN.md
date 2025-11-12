@@ -62,6 +62,9 @@ Frontend (5170) → AI Backend (8000) → GraphCast + AgriBERT
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key_here
 
+# Clerk Authentication
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
+
 # Google Services
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key
 VITE_GEE_PROJECT_ID=massive-hexagon-452605-m0
