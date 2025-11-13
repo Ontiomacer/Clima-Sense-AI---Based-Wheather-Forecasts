@@ -2,8 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env from parent directory
+dotenv.config({ path: join(__dirname, '..', '.env') });
 
 const app = express();
 app.use(cors());
