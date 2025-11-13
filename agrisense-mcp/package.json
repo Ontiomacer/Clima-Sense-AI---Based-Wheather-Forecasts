@@ -10,8 +10,12 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:mcp": "node dist/mcp-server.js",
+    "start:climasense": "node dist/climasense-mcp.js",
+    "start:remote": "node dist/climasense-remote-mcp.js",
     "dev": "ts-node src/index.ts",
     "dev:mcp": "ts-node src/mcp-server.ts",
+    "dev:climasense": "ts-node src/climasense-mcp.ts",
+    "dev:remote": "ts-node src/climasense-remote-mcp.ts",
     "watch": "tsc --watch"
   },
   "keywords": ["mcp", "agriculture", "ai", "climate"],

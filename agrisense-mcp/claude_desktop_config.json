@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "climasense": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\Anil\\Desktop\\Hackathons\\clima-aware-ai-main\\clima-aware-ai-main\\agrisense-mcp\\dist\\climasense-mcp.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

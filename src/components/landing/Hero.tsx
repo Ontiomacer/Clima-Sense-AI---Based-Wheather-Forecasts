@@ -52,7 +52,7 @@ export const Hero = () => {
               AI-Powered Climate
             </span>
             <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent animate-gradient">
-              Intelligence for Agriculture
+              Intelligence for Forecasting
             </span>
           </h1>
 
