@@ -6,6 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11-green.svg)](https://www.python.org/)
 
 AI-powered climate intelligence platform for smart agriculture in Maharashtra, India. Features real-time weather forecasting, satellite imagery analysis, and multilingual support (English, Hindi, Marathi).
+
 Website - Link -> https://clima-sense-ai-based-wheather-forec.vercel.app
 
 ## 🎯 New Features
