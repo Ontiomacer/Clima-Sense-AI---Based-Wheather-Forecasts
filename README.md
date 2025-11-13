@@ -23,8 +23,6 @@ Website - Link -> https://clima-sense-ai-based-wheather-forec.vercel.app
 - Responsive design for all devices
 - Smooth transitions and climate-themed visuals
 
-![ClimaSense Landing Page](https://via.placeholder.com/800x400?text=ClimaSense+Landing+Page)
-![ClimaSense Dashboard](https://via.placeholder.com/800x400?text=ClimaSense+Dashboard)
 
 ## ✨ Features
 
