@@ -35,6 +35,17 @@ export const Hero = () => {
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8 animate-fade-in">
+          {/* Welcome Banner for Judges */}
+          <div className="inline-block mb-4 animate-fade-in">
+            <div className="bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 backdrop-blur-md border border-cyan-400/30 rounded-full px-6 py-3 shadow-lg">
+              <p className="text-cyan-300 font-semibold text-sm sm:text-base flex items-center gap-2 justify-center">
+                <span className="inline-block w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                Welcome Judges of PCCOE-IGC
+                <span className="inline-block w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+              </p>
+            </div>
+          </div>
+
           {/* Headline with Gradient */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight">
             <span className="block text-white mb-2">
@@ -67,7 +78,7 @@ export const Hero = () => {
               onClick={() => {
                 document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="border-2 border-slate-400 text-slate-200 hover:bg-slate-800 hover:text-white px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300"
+              className="border-2 border-white/80 text-white hover:bg-white hover:text-slate-900 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 backdrop-blur-sm bg-white/10"
               aria-label="Learn more about ClimaSense features"
             >
               Learn More
