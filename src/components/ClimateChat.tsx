@@ -91,7 +91,7 @@ const ClimateChat = () => {
   };
 
   const detectStateInQuery = (query: string): string | null => {
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = query.toLowerCase().trim();
     
     // Create variations and aliases for better matching
     const stateAliases: { [key: string]: string } = {
@@ -152,24 +152,32 @@ const ClimateChat = () => {
       'pondy': 'puducherry',
     };
     
-    // First check for city/alias matches
-    for (const [alias, state] of Object.entries(stateAliases)) {
-      if (lowerQuery.includes(alias)) {
+    // FIRST: Check for exact full state name matches (highest priority)
+    for (const [state, _] of Object.entries(indianStates)) {
+      if (lowerQuery.includes(state)) {
         return state;
       }
     }
     
-    // Then check for direct state name matches
-    for (const [state, _] of Object.entries(indianStates)) {
-      // Match full state name or partial (e.g., "maharashtra" or "maha")
-      const stateWords = state.split(' ');
-      const matchesFullName = lowerQuery.includes(state);
-      const matchesPartial = stateWords.some(word => 
-        word.length > 3 && lowerQuery.includes(word)
-      );
-      
-      if (matchesFullName || matchesPartial) {
+    // SECOND: Check for city/alias matches
+    for (const [alias, state] of Object.entries(stateAliases)) {
+      // Use word boundaries to avoid partial matches
+      const regex = new RegExp(`\\b${alias}\\b`, 'i');
+      if (regex.test(lowerQuery)) {
         return state;
+      }
+    }
+    
+    // THIRD: Check for partial matches (only if no exact match found)
+    // This is for cases like "weather in uttar" -> "uttar pradesh"
+    for (const [state, _] of Object.entries(indianStates)) {
+      const stateWords = state.split(' ');
+      // Only match if the first word is present (to avoid "pradesh" matching everything)
+      if (stateWords.length > 1) {
+        const firstWord = stateWords[0];
+        if (firstWord.length > 4 && lowerQuery.includes(firstWord)) {
+          return state;
+        }
       }
     }
     
