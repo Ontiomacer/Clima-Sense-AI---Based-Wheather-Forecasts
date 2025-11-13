@@ -60,21 +60,63 @@ const Forecast = () => {
   };
 
   return (
-    <section id="forecast" className="py-20 px-4">
+    <section id="forecast" className="py-20 px-4 bg-gradient-to-b from-background via-muted/20 to-background">
       <div className="container mx-auto">
         <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">AI-Powered Forecasts</h2>
+          <div className="inline-block mb-4">
+            <div className="bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-purple-500/20 backdrop-blur-md border border-cyan-400/30 rounded-full px-6 py-2">
+              <p className="text-cyan-300 font-semibold text-sm flex items-center gap-2">
+                <Brain className="w-4 h-4" />
+                AI-Powered Climate Predictions
+              </p>
+            </div>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            Advanced Weather Forecasting
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Time series predictions enhanced with NASA POWER and OpenWeather data
+            Machine learning models trained on NASA POWER historical data with real-time OpenWeather integration
           </p>
+          
+          {/* Current Weather Card */}
+          {forecastData?.current && (
+            <div className="mt-8 max-w-md mx-auto">
+              <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md border-cyan-400/30 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Current Temperature</p>
+                      <p className="text-5xl font-bold text-cyan-400">{forecastData.current.temperature}°C</p>
+                      <p className="text-sm text-muted-foreground mt-2 capitalize">{forecastData.current.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <MapPin className="w-6 h-6 text-cyan-400 mb-2 ml-auto" />
+                      <p className="text-sm font-medium">{forecastData.location.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {forecastData.location.lat.toFixed(2)}°N, {forecastData.location.lon.toFixed(2)}°E
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {/* Model Info */}
           {forecastData && (
-            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span>{forecastData.location.name}</span>
-              <span>•</span>
-              <span>Trained on {forecastData.historical.dataPoints} days</span>
-              <span>•</span>
-              <span>{forecastData.model.confidence} confidence</span>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm">
+              <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-muted-foreground">Trained on {forecastData.historical.dataPoints} days</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                <span className="text-muted-foreground">{forecastData.model.confidence} confidence</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                <span className="text-muted-foreground">180-day forecast</span>
+              </div>
             </div>
           )}
         </div>
@@ -99,21 +141,29 @@ const Forecast = () => {
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Temperature Forecast */}
-          <Card className="bg-gradient-card backdrop-blur-sm border-border/50 shadow-card animate-fade-in">
-            <CardHeader>
+          <Card className="bg-gradient-to-br from-card via-card to-blue-500/5 backdrop-blur-sm border-border/50 shadow-xl animate-fade-in hover:shadow-2xl transition-shadow">
+            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-interactive" />
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <Brain className="w-5 h-5 text-blue-400" />
+                    </div>
                     Temperature Forecast - Next 180 Days
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     {forecastData ? forecastData.model.type : 'AI model with 95% confidence intervals'}
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={exportToCSV} disabled={!forecastData}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={exportToCSV} 
+                  disabled={!forecastData}
+                  className="bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20"
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Export CSV
                 </Button>
@@ -165,21 +215,24 @@ const Forecast = () => {
           </Card>
 
           {/* Rainfall Comparison */}
-          <Card className="bg-gradient-card backdrop-blur-sm border-border/50 shadow-card animate-fade-in" style={{ animationDelay: '100ms' }}>
-            <CardHeader>
+          <Card className="bg-gradient-to-br from-card via-card to-cyan-500/5 backdrop-blur-sm border-border/50 shadow-xl animate-fade-in hover:shadow-2xl transition-shadow" style={{ animationDelay: '100ms' }}>
+            <CardHeader className="border-b border-border/50 bg-gradient-to-r from-cyan-500/10 to-purple-500/10">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-accent" />
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <div className="p-2 bg-cyan-500/20 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-cyan-400" />
+                    </div>
                     Rainfall Prediction vs Historical Trend
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     {forecastData ? `Monthly aggregated predictions from NASA POWER data` : 'AI prediction comparison'}
                   </CardDescription>
                 </div>
                 {forecastData?.current && (
-                  <div className="text-sm text-muted-foreground">
-                    Current: {forecastData.current.temperature}°C, {forecastData.current.description}
+                  <div className="px-4 py-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                    <p className="text-xs text-muted-foreground">Humidity</p>
+                    <p className="text-lg font-semibold text-cyan-400">{forecastData.current.humidity}%</p>
                   </div>
                 )}
               </div>

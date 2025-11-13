@@ -94,18 +94,18 @@ const Contact = () => {
                   Join our community and stay updated with the latest climate intelligence insights.
                 </p>
                 <div className="flex gap-4">
-                  <Button variant="outline" size="icon" asChild>
-                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                  <Button variant="outline" size="icon" asChild className="hover:bg-accent/20 hover:border-accent transition-all">
+                    <a href="https://github.com/Ontiomacer" target="_blank" rel="noopener noreferrer" aria-label="GitHub - Tejas Tiwari">
                       <Github className="w-5 h-5" />
                     </a>
                   </Button>
-                  <Button variant="outline" size="icon" asChild>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                  <Button variant="outline" size="icon" asChild className="hover:bg-blue-500/20 hover:border-blue-500 transition-all">
+                    <a href="https://www.linkedin.com/in/tejas-tiwari-9ba569360" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn - Tejas Tiwari">
                       <Linkedin className="w-5 h-5" />
                     </a>
                   </Button>
-                  <Button variant="outline" size="icon" asChild>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                  <Button variant="outline" size="icon" asChild className="hover:bg-sky-500/20 hover:border-sky-500 transition-all">
+                    <a href="https://x.com/_j13394" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) - Tejas Tiwari">
                       <Twitter className="w-5 h-5" />
                     </a>
                   </Button>
