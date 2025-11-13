@@ -24,6 +24,7 @@ const REGION_COORDS: Record<string, { lat: number; lon: number; zoom: number }> 
 const SatelliteView = ({ filters }: SatelliteViewProps) => {
   const [expanded, setExpanded] = useState(false);
   const [activeLayer, setActiveLayer] = useState<'ndvi' | 'rainfall' | 'temperature'>('ndvi');
+  const [mapInitialized, setMapInitialized] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
@@ -62,34 +63,60 @@ const SatelliteView = ({ filters }: SatelliteViewProps) => {
     },
   ];
 
-  // Initialize map
+  // Initialize map when container is ready
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    // Clean up existing map first
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+      setMapInitialized(false);
+    }
 
-    const regionCoords = REGION_COORDS[filters.region] || REGION_COORDS.maharashtra;
+    if (!mapContainerRef.current) return;
 
-    // Create map
-    const map = L.map(mapContainerRef.current, {
-      center: [regionCoords.lat, regionCoords.lon],
-      zoom: regionCoords.zoom,
-      zoomControl: true,
-    });
+    // Small delay to ensure container is fully rendered
+    const timer = setTimeout(() => {
+      if (!mapContainerRef.current) return;
 
-    // Add base layer (OpenStreetMap)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18,
-    }).addTo(map);
+      const regionCoords = REGION_COORDS[filters.region] || REGION_COORDS.maharashtra;
 
-    mapRef.current = map;
+      try {
+        console.log('Initializing Leaflet map...');
+        
+        // Create map
+        const map = L.map(mapContainerRef.current, {
+          center: [regionCoords.lat, regionCoords.lon],
+          zoom: regionCoords.zoom,
+          zoomControl: true,
+          preferCanvas: true,
+        });
+
+        // Add base layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18,
+        }).addTo(map);
+
+        mapRef.current = map;
+        setMapInitialized(true);
+
+        console.log('Map initialized successfully');
+
+        // Force map to resize after initialization
+        setTimeout(() => {
+          if (map) {
+            map.invalidateSize();
+          }
+        }, 200);
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    }, 150);
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      clearTimeout(timer);
     };
-  }, [filters.region]);
+  }, [filters.region, activeLayer]);
 
   // Update map center when region changes
   useEffect(() => {
@@ -178,10 +205,11 @@ const SatelliteView = ({ filters }: SatelliteViewProps) => {
 
                 {/* Map Container */}
                 {!loading && !error && (
-                  <div className="relative">
+                  <div className="relative" key={`map-${layer.id}`}>
                     <div
                       ref={mapContainerRef}
-                      className={`w-full ${expanded ? 'h-[600px]' : 'h-[400px]'} rounded-lg overflow-hidden border border-border`}
+                      id={`map-${layer.id}`}
+                      className={`w-full ${expanded ? 'h-[600px]' : 'h-[400px]'} rounded-lg overflow-hidden border border-border bg-gray-100`}
                       style={{ zIndex: 0 }}
                     />
 
