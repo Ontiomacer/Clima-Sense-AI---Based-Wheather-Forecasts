@@ -373,8 +373,12 @@ const ClimateChat = () => {
         // Use AI backend for farm analysis
         const aiResponse = await callAIBackend(currentQuery, 'analysis');
         
-        if (aiResponse) {
-          const content = `🤖 **AI Analysis**\n\n**Condition Detected:** ${aiResponse.prediction}\n**Confidence:** ${(aiResponse.confidence * 100).toFixed(0)}%\n**Model:** ${aiResponse.model}\n\n💡 This analysis is based on your description. For specific recommendations, ask: "What should I do about ${aiResponse.prediction.toLowerCase()}?"`;
+        if (aiResponse && aiResponse.analysis) {
+          const recommendations = Array.isArray(aiResponse.analysis.recommendations) 
+            ? aiResponse.analysis.recommendations.join('\n• ') 
+            : aiResponse.analysis.recommendations || 'No specific recommendations available';
+          
+          const content = `🤖 **AI Analysis**\n\n**Condition Detected:** ${aiResponse.analysis.category || 'Unknown'}\n**Confidence:** ${((aiResponse.analysis.confidence || 0) * 100).toFixed(0)}%\n**Model:** ${aiResponse.model}\n\n**Recommendations:**\n• ${recommendations}\n\n💡 This analysis is based on your description.`;
           
           const assistantMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -391,8 +395,12 @@ const ClimateChat = () => {
         // Use AI backend for recommendations
         const aiResponse = await callAIBackend(currentQuery, 'farming');
         
-        if (aiResponse) {
-          const content = `🌾 **AI Farming Recommendation**\n\n${aiResponse.recommendation}\n\n**Model:** ${aiResponse.model}\n**Generated:** ${new Date(aiResponse.timestamp).toLocaleTimeString()}`;
+        if (aiResponse && aiResponse.analysis) {
+          const recommendations = Array.isArray(aiResponse.analysis.recommendations) 
+            ? aiResponse.analysis.recommendations.join('\n• ') 
+            : aiResponse.analysis.recommendations || 'No specific recommendations available';
+          
+          const content = `🌾 **AI Farming Recommendation**\n\n**Category:** ${aiResponse.analysis.category || 'General'}\n**Confidence:** ${((aiResponse.analysis.confidence || 0) * 100).toFixed(0)}%\n\n**Recommendations:**\n• ${recommendations}\n\n**Model:** ${aiResponse.model}\n**Generated:** ${new Date(aiResponse.timestamp).toLocaleTimeString()}`;
           
           const assistantMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -422,8 +430,12 @@ const ClimateChat = () => {
         // General query - try AI recommendation
         const aiResponse = await callAIBackend(currentQuery, 'farming');
         
-        if (aiResponse) {
-          const content = `🤖 **AI Response**\n\n${aiResponse.recommendation}\n\n**Model:** ${aiResponse.model}`;
+        if (aiResponse && aiResponse.analysis) {
+          const recommendations = Array.isArray(aiResponse.analysis.recommendations) 
+            ? aiResponse.analysis.recommendations.join('\n• ') 
+            : aiResponse.analysis.recommendations || 'No specific recommendations available';
+          
+          const content = `🤖 **AI Response**\n\n**Category:** ${aiResponse.analysis.category || 'General'}\n**Confidence:** ${((aiResponse.analysis.confidence || 0) * 100).toFixed(0)}%\n\n**Recommendations:**\n• ${recommendations}\n\n**Model:** ${aiResponse.model}`;
           
           const assistantMessage: Message = {
             id: (Date.now() + 1).toString(),
