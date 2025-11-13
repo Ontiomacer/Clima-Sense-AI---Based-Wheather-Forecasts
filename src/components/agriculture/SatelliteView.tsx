@@ -1,42 +1,129 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Satellite, Maximize2, Download } from 'lucide-react';
+import { Satellite, Maximize2, Download, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGEEData } from '@/hooks/useGEEData';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface SatelliteViewProps {
   filters: any;
 }
 
+// Region coordinates for map centering
+const REGION_COORDS: Record<string, { lat: number; lon: number; zoom: number }> = {
+  maharashtra: { lat: 19.5, lon: 75.0, zoom: 7 },
+  pune: { lat: 18.5204, lon: 73.8567, zoom: 10 },
+  mumbai: { lat: 19.0760, lon: 72.8777, zoom: 10 },
+  nagpur: { lat: 21.1458, lon: 79.0882, zoom: 10 },
+  nashik: { lat: 19.9975, lon: 73.7898, zoom: 10 },
+};
+
 const SatelliteView = ({ filters }: SatelliteViewProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [activeLayer, setActiveLayer] = useState<'ndvi' | 'rainfall' | 'temperature'>('ndvi');
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+
+  // Calculate date range (last 30 days)
+  const endDate = new Date().toISOString().split('T')[0];
+  const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  // Fetch GEE data for active layer
+  const { data: geeData, loading, error } = useGEEData(activeLayer, {
+    start: startDate,
+    end: endDate,
+  });
 
   const satelliteLayers = [
     {
-      id: 'ndvi',
+      id: 'ndvi' as const,
       name: 'NDVI (Vegetation)',
       description: 'Normalized Difference Vegetation Index',
       color: 'from-red-500 via-yellow-500 to-green-500',
+      source: 'MODIS/061/MOD13Q1',
     },
     {
-      id: 'rainfall',
-      name: 'Rainfall Anomaly',
-      description: 'Deviation from normal rainfall',
+      id: 'rainfall' as const,
+      name: 'Rainfall',
+      description: 'Precipitation data',
       color: 'from-orange-500 via-white to-blue-500',
+      source: 'UCSB-CHG/CHIRPS/DAILY',
     },
     {
-      id: 'temperature',
-      name: 'Temperature Anomaly',
-      description: 'Deviation from average temperature',
+      id: 'temperature' as const,
+      name: 'Temperature',
+      description: 'Surface temperature',
       color: 'from-blue-500 via-white to-red-500',
-    },
-    {
-      id: 'moisture',
-      name: 'Soil Moisture',
-      description: 'Surface soil moisture levels',
-      color: 'from-yellow-500 via-green-500 to-blue-500',
+      source: 'ECMWF/ERA5_LAND/DAILY_AGGR',
     },
   ];
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    const regionCoords = REGION_COORDS[filters.region] || REGION_COORDS.maharashtra;
+
+    // Create map
+    const map = L.map(mapContainerRef.current, {
+      center: [regionCoords.lat, regionCoords.lon],
+      zoom: regionCoords.zoom,
+      zoomControl: true,
+    });
+
+    // Add base layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18,
+    }).addTo(map);
+
+    mapRef.current = map;
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [filters.region]);
+
+  // Update map center when region changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const regionCoords = REGION_COORDS[filters.region] || REGION_COORDS.maharashtra;
+    mapRef.current.setView([regionCoords.lat, regionCoords.lon], regionCoords.zoom);
+  }, [filters.region]);
+
+  // Update satellite layer when GEE data changes
+  useEffect(() => {
+    if (!mapRef.current || !geeData || !geeData.tileUrl) return;
+
+    // Remove existing tile layer
+    if (tileLayerRef.current) {
+      mapRef.current.removeLayer(tileLayerRef.current);
+    }
+
+    // Add new GEE tile layer
+    const tileLayer = L.tileLayer(geeData.tileUrl, {
+      attribution: `Google Earth Engine - ${geeData.source || 'GEE'}`,
+      maxZoom: 18,
+      opacity: 0.7,
+    });
+
+    tileLayer.addTo(mapRef.current);
+    tileLayerRef.current = tileLayer;
+
+    return () => {
+      if (tileLayerRef.current && mapRef.current) {
+        mapRef.current.removeLayer(tileLayerRef.current);
+      }
+    };
+  }, [geeData]);
 
   return (
     <Card>
@@ -47,7 +134,7 @@ const SatelliteView = ({ filters }: SatelliteViewProps) => {
             Satellite Visualization
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" disabled>
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -59,8 +146,8 @@ const SatelliteView = ({ filters }: SatelliteViewProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="ndvi">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs value={activeLayer} onValueChange={(value) => setActiveLayer(value as any)}>
+          <TabsList className="grid w-full grid-cols-3">
             {satelliteLayers.map((layer) => (
               <TabsTrigger key={layer.id} value={layer.id} className="text-xs">
                 {layer.name.split(' ')[0]}
@@ -71,103 +158,88 @@ const SatelliteView = ({ filters }: SatelliteViewProps) => {
           {satelliteLayers.map((layer) => (
             <TabsContent key={layer.id} value={layer.id} className="mt-4">
               <div className="space-y-4">
-                {/* Satellite Image Placeholder */}
-                <div
-                  className={`relative w-full ${expanded ? 'h-[600px]' : 'h-[400px]'} bg-gradient-to-br ${
-                    layer.color
-                  } rounded-lg overflow-hidden`}
-                >
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Satellite className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-semibold">{layer.name}</p>
-                      <p className="text-sm opacity-75">{layer.description}</p>
-                      <p className="text-xs mt-4 opacity-60">
-                        Region: {filters.region.charAt(0).toUpperCase() + filters.region.slice(1)}
-                      </p>
-                      <p className="text-xs opacity-60 mt-1">
-                        🛰️ Data from Google Earth Engine (MODIS/Sentinel-2)
-                      </p>
+                {/* Loading State */}
+                {loading && (
+                  <div className={`relative w-full ${expanded ? 'h-[600px]' : 'h-[400px]'} bg-muted rounded-lg flex items-center justify-center`}>
+                    <div className="text-center">
+                      <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+                      <p className="text-sm text-muted-foreground">Loading satellite data...</p>
                     </div>
                   </div>
+                )}
 
-                  {/* Legend */}
-                  <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg p-3">
-                    <p className="text-xs text-white font-semibold mb-2">Legend</p>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-32 h-3 rounded bg-gradient-to-r ${layer.color}`}></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-white/80 mt-1">
-                      <span>Low</span>
-                      <span>High</span>
-                    </div>
+                {/* Error State */}
+                {error && !loading && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Map Container */}
+                {!loading && !error && (
+                  <div className="relative">
+                    <div
+                      ref={mapContainerRef}
+                      className={`w-full ${expanded ? 'h-[600px]' : 'h-[400px]'} rounded-lg overflow-hidden border border-border`}
+                      style={{ zIndex: 0 }}
+                    />
+
+                    {/* Legend */}
+                    {geeData && (
+                      <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 z-[1000]">
+                        <p className="text-xs text-white font-semibold mb-2">Legend</p>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-32 h-3 rounded bg-gradient-to-r ${layer.color}`}></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-white/80 mt-1">
+                          <span>Low</span>
+                          <span>High</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Metadata */}
+                    {geeData && (
+                      <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white z-[1000]">
+                        <p className="text-xs">
+                          <strong>Date Range:</strong> {startDate} to {endDate}
+                        </p>
+                        <p className="text-xs mt-1">
+                          <strong>Source:</strong> {layer.source}
+                        </p>
+                        <p className="text-xs mt-1">
+                          <strong>Region:</strong> {filters.region.charAt(0).toUpperCase() + filters.region.slice(1)}
+                        </p>
+                        {geeData.source && (
+                          <p className="text-xs mt-1">
+                            <strong>Data:</strong> {geeData.source === 'real-gee-data' ? '🟢 Live' : '🟡 Fallback'}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
-
-                  {/* Metadata */}
-                  <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white">
-                    <p className="text-xs">
-                      <strong>Date:</strong> {new Date().toLocaleDateString()}
-                    </p>
-                    <p className="text-xs mt-1">
-                      <strong>Resolution:</strong> 250m
-                    </p>
-                    <p className="text-xs mt-1">
-                      <strong>Source:</strong> {layer.id === 'ndvi' ? 'MODIS' : 'Sentinel-2'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Analysis */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardContent className="p-4">
-                      <p className="text-sm font-medium mb-1">Average Value</p>
-                      <p className="text-2xl font-bold">
-                        {layer.id === 'ndvi' && '0.68'}
-                        {layer.id === 'rainfall' && '-11%'}
-                        {layer.id === 'temperature' && '+2.1°C'}
-                        {layer.id === 'moisture' && '42%'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <p className="text-sm font-medium mb-1">Trend</p>
-                      <p className="text-2xl font-bold text-green-500">
-                        {layer.id === 'ndvi' && '↑ Improving'}
-                        {layer.id === 'rainfall' && '↓ Declining'}
-                        {layer.id === 'temperature' && '↑ Rising'}
-                        {layer.id === 'moisture' && '↓ Decreasing'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4">
-                      <p className="text-sm font-medium mb-1">Status</p>
-                      <p className="text-2xl font-bold">
-                        {layer.id === 'ndvi' && '🟢 Healthy'}
-                        {layer.id === 'rainfall' && '🟠 Deficit'}
-                        {layer.id === 'temperature' && '🟢 Normal'}
-                        {layer.id === 'moisture' && '🟡 Moderate'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
+                )}
 
                 {/* Insights */}
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <p className="text-sm font-semibold mb-2">Satellite Insights</p>
-                  <p className="text-xs text-muted-foreground">
-                    {layer.id === 'ndvi' &&
-                      'Vegetation index shows healthy crop growth across the region. NDVI values above 0.6 indicate good photosynthetic activity.'}
-                    {layer.id === 'rainfall' &&
-                      'Rainfall anomaly indicates 11% deficit compared to historical average. Monitor soil moisture and plan irrigation.'}
-                    {layer.id === 'temperature' &&
-                      'Temperature anomaly shows +2.1°C above normal. Crops are within tolerance but monitor for heat stress.'}
-                    {layer.id === 'moisture' &&
-                      'Soil moisture at moderate levels. Surface moisture declining - irrigation recommended within 3 days.'}
-                  </p>
-                </div>
+                {geeData && (
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <p className="text-sm font-semibold mb-2">📡 Satellite Data Information</p>
+                    <p className="text-xs text-muted-foreground">
+                      {layer.id === 'ndvi' &&
+                        'NDVI (Normalized Difference Vegetation Index) measures vegetation health. Higher values (green) indicate healthy, dense vegetation, while lower values (brown/red) indicate sparse or stressed vegetation.'}
+                      {layer.id === 'rainfall' &&
+                        'Rainfall data from CHIRPS shows precipitation patterns. Blue areas indicate higher rainfall, while orange/red areas show lower precipitation.'}
+                      {layer.id === 'temperature' &&
+                        'Surface temperature from ERA5 Land. Red areas indicate higher temperatures, blue areas show cooler temperatures. Useful for identifying heat stress zones.'}
+                    </p>
+                    {geeData.message && (
+                      <p className="text-xs text-muted-foreground mt-2 italic">
+                        ℹ️ {geeData.message}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </TabsContent>
           ))}
